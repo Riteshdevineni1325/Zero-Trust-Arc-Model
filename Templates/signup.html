@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zero Trust | Sign Up</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0d1117;
+            color: #e6edf3;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(88,166,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(88,166,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes gridMove {
+            0%   { transform: translateY(0); }
+            100% { transform: translateY(40px); }
+        }
+
+        .card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.5s cubic-bezier(0.16,1,0.3,1) both;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .logo svg {
+            width: 48px;
+            height: 48px;
+            color: #58a6ff;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { filter: drop-shadow(0 0 8px rgba(88,166,255,0.3)); }
+            50%       { filter: drop-shadow(0 0 20px rgba(88,166,255,0.7)); }
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #8b949e;
+            margin-bottom: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            color: #8b949e;
+            margin-bottom: 6px;
+            transition: color 0.2s;
+        }
+
+        .form-group:focus-within label { color: #58a6ff; }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-wrap svg {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            color: #8b949e;
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+
+        .form-group:focus-within .input-wrap svg { color: #58a6ff; }
+
+        input, select {
+            width: 100%;
+            padding: 10px 14px 10px 38px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: #e6edf3;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+            appearance: none;
+        }
+
+        select { cursor: pointer; }
+
+        input:focus, select:focus {
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 3px rgba(88,166,255,0.1);
+        }
+
+        input.valid   { border-color: #3fb950; }
+        input.invalid { border-color: #f85149; }
+
+        .validation-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.85rem;
+            pointer-events: none;
+        }
+
+        /* Password strength bar */
+        .strength-bar {
+            height: 3px;
+            border-radius: 2px;
+            background: #30363d;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 2px;
+            transition: width 0.3s, background 0.3s;
+        }
+
+        .strength-label {
+            font-size: 0.75rem;
+            color: #8b949e;
+            margin-top: 4px;
+            min-height: 16px;
+            transition: color 0.3s;
+        }
+
+        /* Admin section */
+        .admin-section {
+            display: none;
+            background: #0d1117;
+            border: 1px solid #f0883e44;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .admin-section-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #f0883e;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+        }
+
+        .admin-section .form-group:last-child { margin-bottom: 0; }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 11px;
+            background: #238636;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+            position: relative;
+        }
+
+        button[type="submit"]:hover {
+            background: #2ea043;
+            box-shadow: 0 4px 16px rgba(46,160,67,0.3);
+        }
+
+        button[type="submit"]:active { transform: scale(0.98); }
+
+        button[type="submit"].loading { pointer-events: none; background: #238636aa; }
+
+        .spinner {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        button[type="submit"].loading .btn-text { display: none; }
+        button[type="submit"].loading .spinner  { display: block; }
+
+        #result {
+            margin-top: 14px;
+            text-align: center;
+            font-size: 0.875rem;
+            min-height: 20px;
+            color: #f85149;
+        }
+
+        #result.success { color: #3fb950; }
+
+        #result.show { animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .footer-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #8b949e;
+        }
+
+        .footer-link a {
+            color: #58a6ff;
+            text-decoration: none;
+            position: relative;
+        }
+
+        .footer-link a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px; left: 0;
+            width: 0; height: 1px;
+            background: #58a6ff;
+            transition: width 0.2s;
+        }
+
+        .footer-link a:hover::after { width: 100%; }
+    </style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="card">
+    <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+    </div>
+    <h2>Create Account</h2>
+    <p class="subtitle">Join the Zero Trust workspace</p>
+
+    <form id="signupForm" novalidate>
+        <div class="form-group">
+            <label for="username">Username</label>
+            <div class="input-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                <input type="text" id="username" placeholder="Choose a username" required>
+                <span class="validation-icon" id="usernameIcon"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <div class="input-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <input type="password" id="password" placeholder="Choose a password" required>
+                <span class="validation-icon" id="passwordIcon"></span>
+            </div>
+            <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+            <div class="strength-label" id="strengthLabel"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="role">Role</label>
+            <div class="input-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <select id="role" onchange="toggleAdminFields()">
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="admin-section" id="adminFields">
+            <div class="admin-section-title">⚠ Admin Verification Required</div>
+            <div class="form-group">
+                <label for="admin_username">Existing Admin Username</label>
+                <div class="input-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                    <input type="text" id="admin_username" placeholder="Admin username">
+                </div>
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+                <label for="admin_password">Existing Admin Password</label>
+                <div class="input-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <input type="password" id="admin_password" placeholder="Admin password">
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" id="submitBtn">
+            <span class="btn-text">Create Account</span>
+            <div class="spinner"></div>
+        </button>
+    </form>
+
+    <p id="result"></p>
+
+    <div class="footer-link">
+        Already have an account? <a href="/">Sign in</a>
+    </div>
+</div>
+
+<script>
+function toggleAdminFields() {
+    const section = document.getElementById("adminFields");
+    const isAdmin = document.getElementById("role").value === "admin";
+    if (isAdmin) {
+        section.style.display = "block";
+        section.animate([{ opacity: 0, transform: "translateY(-8px)" }, { opacity: 1, transform: "translateY(0)" }], { duration: 250 });
+    } else {
+        section.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200 }).onfinish = () => {
+            section.style.display = "none";
+        };
+    }
+}
+
+// Username validation
+document.getElementById("username").addEventListener("input", function () {
+    const icon = document.getElementById("usernameIcon");
+    if (this.value.trim().length >= 3) {
+        this.className = "valid";
+        icon.innerHTML = '<span style="color:#3fb950">✓</span>';
+    } else {
+        this.className = this.value.length ? "invalid" : "";
+        icon.innerHTML = this.value.length ? '<span style="color:#f85149">✗</span>' : "";
+    }
+});
+
+// Password strength
+document.getElementById("password").addEventListener("input", function () {
+    const val = this.value;
+    const fill  = document.getElementById("strengthFill");
+    const label = document.getElementById("strengthLabel");
+    const icon  = document.getElementById("passwordIcon");
+
+    let score = 0;
+    if (val.length >= 8)          score++;
+    if (/[A-Z]/.test(val))        score++;
+    if (/[0-9]/.test(val))        score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+
+    const levels = [
+        { pct: "0%",   color: "#30363d", text: "" },
+        { pct: "25%",  color: "#f85149", text: "Weak" },
+        { pct: "50%",  color: "#f0883e", text: "Fair" },
+        { pct: "75%",  color: "#e3b341", text: "Good" },
+        { pct: "100%", color: "#3fb950", text: "Strong" },
+    ];
+
+    const lvl = val.length === 0 ? levels[0] : levels[score] || levels[1];
+    fill.style.width      = lvl.pct;
+    fill.style.background = lvl.color;
+    label.style.color     = lvl.color;
+    label.innerText       = lvl.text;
+
+    if (val.length >= 6) {
+        this.className = "valid";
+        icon.innerHTML = '<span style="color:#3fb950">✓</span>';
+    } else {
+        this.className = val.length ? "invalid" : "";
+        icon.innerHTML = val.length ? '<span style="color:#f85149">✗</span>' : "";
+    }
+});
+
+document.getElementById("signupForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const result = document.getElementById("result");
+    const btn    = document.getElementById("submitBtn");
+    result.className = "";
+    btn.classList.add("loading");
+
+    const role = document.getElementById("role").value;
+    const body = {
+        username: document.getElementById("username").value,
+        password: document.getElementById("password").value,
+        role
+    };
+
+    if (role === "admin") {
+        body.admin_username = document.getElementById("admin_username").value;
+        body.admin_password = document.getElementById("admin_password").value;
+    }
+
+    try {
+        const res  = await fetch("/signup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+            result.className = "success show";
+            result.innerText = data.msg;
+        } else {
+            result.className = "show";
+            result.innerText = data.msg || "Error occurred";
+        }
+    } catch {
+        result.className = "show";
+        result.innerText = "Server error";
+    } finally {
+        btn.classList.remove("loading");
+    }
+});
+</script>
+</body>
+</html>

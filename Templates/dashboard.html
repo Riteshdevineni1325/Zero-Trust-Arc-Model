@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zero Trust | Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0d1117;
+            color: #e6edf3;
+            min-height: 100vh;
+            animation: fadeBody 0.4s ease both;
+        }
+
+        @keyframes fadeBody {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        /* Nav */
+        nav {
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            padding: 14px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(8px);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .nav-brand svg {
+            width: 24px;
+            height: 24px;
+            color: #58a6ff;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { filter: drop-shadow(0 0 4px rgba(88,166,255,0.3)); }
+            50%       { filter: drop-shadow(0 0 12px rgba(88,166,255,0.7)); }
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        #welcome {
+            font-size: 0.85rem;
+            color: #8b949e;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: #1f6feb22;
+            color: #58a6ff;
+            border: 1px solid #1f6feb44;
+        }
+
+        .role-badge.admin {
+            background: #f0883e22;
+            color: #f0883e;
+            border-color: #f0883e44;
+        }
+
+        .btn-logout {
+            padding: 7px 16px;
+            background: transparent;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: #e6edf3;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s, transform 0.1s;
+        }
+
+        .btn-logout:hover  { background: #21262d; border-color: #8b949e; }
+        .btn-logout:active { transform: scale(0.97); }
+
+        /* Main */
+        main {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 24px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            border-color: #58a6ff44;
+            box-shadow: 0 4px 20px rgba(88,166,255,0.05);
+        }
+
+        .card-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #8b949e;
+            margin-bottom: 12px;
+        }
+
+        .btn {
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:active { transform: scale(0.97); }
+
+        .btn-primary {
+            background: #1f6feb;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #388bfd;
+            box-shadow: 0 4px 14px rgba(31,111,235,0.35);
+        }
+
+        .btn-danger {
+            background: #da3633;
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            background: #f85149;
+            box-shadow: 0 4px 14px rgba(248,81,73,0.35);
+        }
+
+        .btn.loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        /* Output */
+        .output-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .output-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #30363d;
+            transition: background 0.3s;
+            margin-right: 8px;
+            display: inline-block;
+        }
+
+        .output-dot.active { background: #3fb950; animation: blink 1s ease 3; }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.3; }
+        }
+
+        #output {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 0.85rem;
+            font-family: 'Courier New', monospace;
+            color: #3fb950;
+            min-height: 80px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            transition: all 0.3s;
+        }
+
+        #output.loading-state {
+            color: #8b949e;
+            animation: shimmer 1.2s ease infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.5; }
+        }
+
+        #output.error-state { color: #f85149; }
+
+        /* Admin section */
+        .admin-card {
+            background: #161b22;
+            border: 1px solid #f0883e44;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 16px;
+            animation: slideUp 0.4s cubic-bezier(0.16,1,0.3,1) both;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .admin-badge {
+            display: inline-block;
+            background: #f0883e22;
+            color: #f0883e;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #f0883e44;
+        }
+
+        .admin-input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .admin-input-row input {
+            flex: 1;
+            padding: 9px 14px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: #e6edf3;
+            font-size: 0.875rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .admin-input-row input:focus {
+            border-color: #f0883e;
+            box-shadow: 0 0 0 3px rgba(240,136,62,0.1);
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 14px 20px;
+            font-size: 0.875rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            transform: translateY(80px);
+            opacity: 0;
+            transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), opacity 0.3s;
+            z-index: 999;
+            max-width: 300px;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success { border-color: #3fb95044; color: #3fb950; }
+        .toast.error   { border-color: #f8514944; color: #f85149; }
+
+        @media (max-width: 600px) {
+            .grid { grid-template-columns: 1fr; }
+            .admin-input-row { flex-direction: column; }
+            .admin-input-row input { width: 100%; }
+            nav { padding: 12px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-brand">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        Zero Trust
+    </div>
+    <div class="nav-right">
+        <span id="welcome"></span>
+        <span id="roleBadge" class="role-badge"></span>
+        <button class="btn-logout" onclick="logout()">Sign Out</button>
+    </div>
+</nav>
+
+<main>
+    <div class="page-title">Dashboard</div>
+
+    <div class="grid">
+        <div class="card">
+            <div class="card-title">User Data</div>
+            <button class="btn btn-primary" id="btnUser" onclick="getDashboard()">Fetch User Data</button>
+        </div>
+        <div class="card">
+            <div class="card-title">Admin Data</div>
+            <button class="btn btn-primary" id="btnAdmin" onclick="getAdmin()">Fetch Admin Data</button>
+        </div>
+    </div>
+
+    <div class="output-card">
+        <div class="output-header">
+            <div class="card-title" style="margin:0">
+                <span class="output-dot" id="outputDot"></span>Response
+            </div>
+        </div>
+        <pre id="output">No data fetched yet.</pre>
+    </div>
+
+    <div class="admin-card" id="adminSection" style="display:none;">
+        <span class="admin-badge">⚡ Admin Controls</span>
+        <div class="card-title">Delete User</div>
+        <div class="admin-input-row">
+            <input type="text" id="deleteUsername" placeholder="Enter username to delete">
+            <button class="btn btn-danger" onclick="deleteUser()">Delete</button>
+        </div>
+    </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const token = localStorage.getItem("token");
+
+function parseJwt(t) {
+    try { return JSON.parse(atob(t.split('.')[1])); }
+    catch { return null; }
+}
+
+function showToast(msg, type = "success") {
+    const toast = document.getElementById("toast");
+    toast.textContent = msg;
+    toast.className = "toast " + type + " show";
+    setTimeout(() => { toast.className = "toast " + type; }, 3000);
+}
+
+function setOutput(text, state = "") {
+    const el  = document.getElementById("output");
+    const dot = document.getElementById("outputDot");
+    el.className = state;
+    el.innerText = text;
+    if (state !== "loading-state") {
+        dot.className = "output-dot active";
+    }
+}
+
+window.onload = function () {
+    if (!token) {
+        alert("Please login first");
+        window.location.href = "/";
+        return;
+    }
+
+    const decoded = parseJwt(token);
+    if (decoded) {
+        document.getElementById("welcome").innerText = decoded.sub;
+        const badge = document.getElementById("roleBadge");
+        badge.innerText = decoded.role;
+        if (decoded.role === "admin") {
+            badge.classList.add("admin");
+            document.getElementById("adminSection").style.display = "block";
+        }
+    }
+};
+
+async function getDashboard() {
+    const btn = document.getElementById("btnUser");
+    btn.classList.add("loading");
+    btn.innerText = "Loading...";
+    setOutput("Fetching user data...", "loading-state");
+
+    try {
+        const res  = await fetch("/dashboard", { headers: { "Authorization": "Bearer " + token } });
+        const data = await res.json();
+        setOutput(JSON.stringify(data, null, 2), res.ok ? "" : "error-state");
+    } catch {
+        setOutput("Request failed.", "error-state");
+    } finally {
+        btn.classList.remove("loading");
+        btn.innerText = "Fetch User Data";
+    }
+}
+
+async function getAdmin() {
+    const btn = document.getElementById("btnAdmin");
+    btn.classList.add("loading");
+    btn.innerText = "Loading...";
+    setOutput("Fetching admin data...", "loading-state");
+
+    try {
+        const res  = await fetch("/admin", { headers: { "Authorization": "Bearer " + token } });
+        const data = await res.json();
+        setOutput(JSON.stringify(data, null, 2), res.ok ? "" : "error-state");
+    } catch {
+        setOutput("Request failed.", "error-state");
+    } finally {
+        btn.classList.remove("loading");
+        btn.innerText = "Fetch Admin Data";
+    }
+}
+
+async function deleteUser() {
+    const username = document.getElementById("deleteUsername").value.trim();
+    if (!username) { showToast("Enter a username", "error"); return; }
+
+    try {
+        const res  = await fetch("/delete-user/" + username, {
+            method: "DELETE",
+            headers: { "Authorization": "Bearer " + token }
+        });
+        const data = await res.json();
+        showToast(data.msg, res.ok ? "success" : "error");
+        if (res.ok) document.getElementById("deleteUsername").value = "";
+    } catch {
+        showToast("Request failed", "error");
+    }
+}
+
+function logout() {
+    localStorage.removeItem("token");
+    window.location.href = "/";
+}
+</script>
+</body>
+</html>
